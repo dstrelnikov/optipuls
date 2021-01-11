@@ -1,0 +1,25 @@
+#stages:
+  #- test
+  #- compute
+  #- render
+
+test:
+  image: quay.io/fenicsproject/stable:latest
+  script: python3 -m unittest
+
+compute:
+  image: quay.io/fenicsproject/stable:latest
+  script: mkdir -p /scratch/optipuls/$CI_COMMIT_SHORT_SHA/paraview
+  script: ln -s /scratch/cache/dijitso /home/fenics/.cahe/dijitso
+  script: python3 run.py --scratch /scratch/optipuls/$CI_COMMIT_SHORT_SHA
+  artifacts:
+    paths:
+      - /scratch/optipuls/$CI_COMMIT_SHORT_SHA
+
+# render:
+#   image: paraview
+#   script: pvbatch pv_ani.py --state optipuls-evo.pvsm --resolution 3840x2160 --output /scratch/paraview/ani.png
+#   script: ffmpeg -r 60 -f image2 -s 3840x2160 -i ani.%04d.png -vcodec libx264 -pix_fmt yuv420p -crf 17 evo-optimized.mp4
+#   artifacts:
+#     paths:
+#       - evo-optimized.mp4
